@@ -1,0 +1,47 @@
+@Library("Shared") _
+pipeline{
+    
+    agent { label "vinod"}
+    
+    stages{
+        
+        stage("Heloo"){
+            steps{
+                script{
+                    hello()
+                }
+            }
+        }
+        
+        stage("Code"){
+            steps{
+                echo "This is cloning the code"
+                git url: "https://github.com/devopstraining99/demo-app.git",branch:"main"
+            }
+        }
+        stage("Build"){
+            steps{
+                echo "This is Building the code"
+                sh "docker build -t demo-app:latest ."
+            }
+        }
+        stage("Push To DockerHub"){
+            steps{
+                withCredentials([usernamePassword(
+                    credentialsId:"CredDockerHub",
+                    usernameVariable:"dockerHubUser", 
+                    passwordVariable:"dockerHubPass")]){
+                sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
+                sh "docker image tag demo-app:latest ${env.dockerHubUser}/demo-app:latest"
+                sh "docker push ${env.dockerHubUser}/demo-app:latest"
+                }
+            }
+        }
+        stage("Deploy"){
+            steps{
+                echo "This is deploying the code"
+                sh "docker run -d -p 80:80 demo-app:latest"
+            }
+        }
+    }
+}
