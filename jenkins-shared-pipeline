@@ -1,0 +1,44 @@
+@Library("Shared") _
+pipeline{
+    
+    agent { label "vinod"}
+    
+    stages{
+        
+        stage("Heloo"){
+            steps{
+                script{
+                    hello()
+                }
+            }
+        }
+        
+        stage("Code"){
+            steps{
+                script{
+                    clone("https://github.com/devopstraining99/demo-app.git","main")
+                }
+            }
+        }
+        stage("Build"){
+            steps{
+                script{
+                    docker_build("demo-app", "latest", "ankit06singh")
+                }
+            }
+        }
+        stage("Push To DockerHub"){
+            steps{
+                script{
+                    docker_push("demo-app", "latest", "ankit06singh")
+                }
+            }
+        }
+        stage("Deploy"){
+            steps{
+                echo "This is deploying the code"
+                sh "docker run -d -p 80:80 demo-app:latest"
+            }
+        }
+    }
+}
