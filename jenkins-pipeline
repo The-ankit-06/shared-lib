@@ -1,17 +1,8 @@
-@Library("Shared") _
 pipeline{
     
     agent { label "vinod"}
     
     stages{
-        
-        stage("Heloo"){
-            steps{
-                script{
-                    hello()
-                }
-            }
-        }
         
         stage("Code"){
             steps{
@@ -22,7 +13,7 @@ pipeline{
         stage("Build"){
             steps{
                 echo "This is Building the code"
-                sh "docker build -t demo-app:latest ."
+                sh "docker build -t demo-app:latest ." # . represting location of the code
             }
         }
         stage("Push To DockerHub"){
